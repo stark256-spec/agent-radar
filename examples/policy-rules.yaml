@@ -1,0 +1,89 @@
+rules:
+  # ── Data sensitivity ─────────────────────────────────────────────────────────
+
+  - name: hr_data_access
+    description: Any agent accessing HR data sources
+    severity: high
+    condition:
+      data_source_contains: "HR"
+    action: alert
+
+  - name: finance_data_access
+    description: Any agent accessing finance data sources
+    severity: high
+    condition:
+      data_source_contains: "finance"
+    action: alert
+
+  - name: pii_query_detected
+    description: Query text appears to contain PII-related terms
+    severity: high
+    condition:
+      query_contains: "ssn"
+    action: alert
+
+  # ── Cost controls ─────────────────────────────────────────────────────────────
+
+  - name: excessive_cost_critical
+    description: Single query cost exceeds $5
+    severity: critical
+    condition:
+      cost_usd_gt: 5.0
+    action: alert
+
+  - name: excessive_cost_high
+    description: Single query cost exceeds $1
+    severity: high
+    condition:
+      cost_usd_gt: 1.0
+    action: alert
+
+  - name: excessive_tokens
+    description: Single request exceeds 100K tokens
+    severity: medium
+    condition:
+      tokens_gt: 100000
+    action: alert
+
+  # ── Time-based controls ───────────────────────────────────────────────────────
+
+  - name: after_hours_finance
+    description: Finance agents used outside business hours (8–18 UTC)
+    severity: medium
+    condition:
+      hour_outside: [8, 18]
+      agent_name_contains: "finance"
+    action: alert
+
+  - name: after_hours_hr
+    description: HR agents used outside business hours
+    severity: medium
+    condition:
+      hour_outside: [8, 18]
+      agent_name_contains: "hr"
+    action: alert
+
+  # ── Performance thresholds ───────────────────────────────────────────────────
+
+  - name: high_latency
+    description: Response latency exceeds 10 seconds
+    severity: medium
+    condition:
+      latency_ms_gt: 10000
+    action: alert
+
+  - name: critical_latency
+    description: Response latency exceeds 30 seconds
+    severity: high
+    condition:
+      latency_ms_gt: 30000
+    action: alert
+
+  # ── Error monitoring ─────────────────────────────────────────────────────────
+
+  - name: failed_query
+    description: Any failed agent query
+    severity: low
+    condition:
+      success_is: false
+    action: alert
